@@ -64,7 +64,7 @@ $(document).ready(function() {
 			spirographs[i].drawPoint();
 		}
 
-		ctx.fillStyle="rgba(255, 255, 255, 0.01)";
+		ctx.fillStyle="rgba(0, 0, 0, 0.03)";
 		ctx.fillRect(0,0, 1000, 1000)
 	}, 1)
 
@@ -116,7 +116,7 @@ $(document).ready(function() {
 
 		this.drawPoint = function() {
 			if (this.shouldDraw == true) {
-				var secs = new Date().getTime()/500;
+				var secs = new Date().getTime()/800;
 
 				var x = (this.fixedCircleRadius+this.movingCircleRadius) * Math.cos(secs) - (this.movingCircleRadius+this.pointOffset) * Math.cos(((this.fixedCircleRadius + this.movingCircleRadius)/this.movingCircleRadius)*secs) + 500;
 
@@ -132,7 +132,7 @@ $(document).ready(function() {
 				// this.prevY = y;
 
 				ctx.fillStyle=this.fillStyle;
-				ctx.strokeStyle="rgba(0,0,0, 0)"
+				ctx.lineWidth = 0;
 				ctx.fillRect(x, y, 3, 3)
 			}
 		}

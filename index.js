@@ -24,10 +24,10 @@ app.get("/", function(req, res) {
 })
 
 function logThis(p) {
-	if (p.advertisement.localName == "janeBLE") {
-		console.log(p.advertisement.localName)
+	// if (p.advertisement.localName == "Time") {
+		console.log("uuid: " + p.uuid + " & name: " + p.advertisement.localName)
 		io.sockets.emit('newdevice', {message: {"uuid" : p.uuid, "rssi": p.rssi, "txPowerLevel" : p.advertisement.txPowerLevel}})
-	}
+	// }
 }
 
 var io = require('socket.io').listen(app.listen(5000));
