@@ -2,7 +2,6 @@ var express = require('express')
 var app = express();
 var path = require('path');
 var request = require('request');
-var routes = require('./routes/index');
 
 var noble = require('noble');
 
@@ -24,10 +23,23 @@ app.get("/", function(req, res) {
 })
 
 function logThis(p) {
-	// if (p.advertisement.localName == "Time") {
-		console.log("uuid: " + p.uuid + " & name: " + p.advertisement.localName)
-		io.sockets.emit('newdevice', {message: {"uuid" : p.uuid, "rssi": p.rssi, "txPowerLevel" : p.advertisement.txPowerLevel}})
-	// }
+		var advLength = p.advertisement.manufacturerData;
+		if (advLength != undefined) {
+			advLength = advLength.toString('ascii').length
+		} else {
+			advLength = 0;
+		}
+
+		var tx = p.advertisement.txPowerLevel;
+
+		console.log(tx)
+		if (tx != undefined) {
+			tx = (tx + 100)/2;
+		} else {
+			tx = .1;
+		}
+
+		io.sockets.emit('newdevice', {message: {"uuid" : p.uuid, "rssi": p.rssi, "txPowerLevel" : tx, "advLength" : advLength, "deviceName" : p.advertisement.localName}})
 }
 
 var io = require('socket.io').listen(app.listen(5000));

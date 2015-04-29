@@ -26,16 +26,19 @@ $(document).ready(function() {
 
 			if (inArr == false) {
 				var s = new Spirograph();
-				var abs = Math.abs(data.message.rssi*5)
-				var pwr = Math.abs(data.message.txPowerLevel);
-				if (isNaN(pwr)) {
-					pwr = 1;
-				}
-				console.log("pwr: " + pwr)
+				var abs = Math.abs(data.message.rssi)
+				var pwr = data.message.txPowerLevel;
+				var msg = data.message.advLength;
 
-				s.init(data.message.uuid, abs, pwr-(Math.random() * pwr) * 10, pwr, '#'+Math.floor(Math.random()*16777215).toString(16))
+				if (msg == undefined) {
+					msg = .01
+				}
+
+				var color = '#'+Math.floor(Math.random()*16777215).toString(16);
+				s.init(data.message.uuid, abs, msg, pwr, color)
 				s.updateSeen(new Date().getTime())
 				spirographs.push(s)
+				$("body").append("<p id='" + data.message.deviceName + "' style='color:" + color +";'>" + data.message.deviceName + "</p>")
 			} else {
 				var which;
 
@@ -48,10 +51,27 @@ $(document).ready(function() {
 						}
 					})
 				})
-				spirographs[which].updateRSSI(data.message.rssi)
+
+				var abs = Math.abs(data.message.rssi)
+				var pwr = data.message.txPowerLevel;
+				var msg = data.message.advLength;
+
+				console.log(msg)
+
+				if (msg == undefined) {
+					msg = .01
+				}
+
+
+				spirographs[which].updateFixedCircleRadius(abs)
+				spirographs[which].updateMovingCircleRadius(pwr);
+				spirographs[which].updatePointOffset(msg);
+
+
 				spirographs[which].updateSeen(new Date().getTime())
 				spirographs[which].updateDraw(true)
 			}
+
 		}
 
 	})
@@ -65,7 +85,7 @@ $(document).ready(function() {
 		}
 
 		ctx.fillStyle="rgba(0, 0, 0, 0.03)";
-		ctx.fillRect(0,0, 1000, 1000)
+		ctx.fillRect(0,0, 500, 500)
 	}, 1)
 
 	setInterval(function() {
@@ -99,11 +119,18 @@ $(document).ready(function() {
 			this.movingCircleRadius = moving;
 			this.pointOffset = point;
 			this.fillStyle = style;
-			console.log("fixed: " + this.fixedCircleRadius)
 		}
 
-		this.updateRSSI = function(val) {
-			this.fixedCircleRadius = Math.abs(val) * 5;
+		this.updateFixedCircleRadius = function(val) {
+			this.fixedCircleRadius = Math.abs(val);
+		}
+
+		this.updateMovingCircleRadius = function(val) {
+			this.movingCircleRadius = Math.abs(val);
+		}
+
+		this.updatePointOffset = function(val) {
+			this.point = val;
 		}
 
 		this.updateSeen = function(time) {
@@ -118,18 +145,9 @@ $(document).ready(function() {
 			if (this.shouldDraw == true) {
 				var secs = new Date().getTime()/800;
 
-				var x = (this.fixedCircleRadius+this.movingCircleRadius) * Math.cos(secs) - (this.movingCircleRadius+this.pointOffset) * Math.cos(((this.fixedCircleRadius + this.movingCircleRadius)/this.movingCircleRadius)*secs) + 500;
+				var x = (this.fixedCircleRadius+this.movingCircleRadius) * Math.cos(secs) - (this.movingCircleRadius+this.pointOffset) * Math.cos(((this.fixedCircleRadius + this.movingCircleRadius)/this.movingCircleRadius)*secs) + 250;
 
-				var y = (this.fixedCircleRadius+this.movingCircleRadius) * Math.sin(secs) - (this.movingCircleRadius+this.pointOffset) * Math.sin(((this.fixedCircleRadius + this.movingCircleRadius)/this.movingCircleRadius)*secs) + 500;
-
-				// ctx.strokeStyle = this.fillStyle;
-				// ctx.beginPath();
-				// ctx.moveTo(this.prevX, this.prevY);
-				// ctx.lineTo(x, y);
-				// ctx.stroke();
-
-				// this.prevX = x;
-				// this.prevY = y;
+				var y = (this.fixedCircleRadius+this.movingCircleRadius) * Math.sin(secs) - (this.movingCircleRadius+this.pointOffset) * Math.sin(((this.fixedCircleRadius + this.movingCircleRadius)/this.movingCircleRadius)*secs) + 250;
 
 				ctx.fillStyle=this.fillStyle;
 				ctx.lineWidth = 0;
