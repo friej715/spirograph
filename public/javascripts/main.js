@@ -56,8 +56,6 @@ $(document).ready(function() {
 				var pwr = data.message.txPowerLevel;
 				var msg = data.message.advLength;
 
-				console.log(msg)
-
 				if (msg == undefined) {
 					msg = .01
 				}
@@ -84,7 +82,7 @@ $(document).ready(function() {
 			spirographs[i].drawPoint();
 		}
 
-		ctx.fillStyle="rgba(0, 0, 0, 0.03)";
+		ctx.fillStyle="rgba(255, 255, 255, 0.03)";
 		ctx.fillRect(0,0, 500, 500)
 	}, 1)
 
@@ -104,6 +102,7 @@ $(document).ready(function() {
 		this.lastSeen = null;
 
 		this.fixedCircleRadius = null;
+		this.allFixedCircleRadii = [];
 		this.movingCircleRadius = null;
 		this.pointOffset = null;
 
@@ -122,7 +121,18 @@ $(document).ready(function() {
 		}
 
 		this.updateFixedCircleRadius = function(val) {
-			this.fixedCircleRadius = Math.abs(val);
+			var max = 5;
+
+			this.allFixedCircleRadii.unshift(Math.abs(val));
+			this.allFixedCircleRadii = this.allFixedCircleRadii.slice(0, max);
+
+			var sum = 0;
+			for (var i = 0; i < this.allFixedCircleRadii.length; i++) {
+				sum += this.allFixedCircleRadii[i];
+			}
+
+			var avg = sum / this.allFixedCircleRadii.length;
+			this.fixedCircleRadius = avg;
 		}
 
 		this.updateMovingCircleRadius = function(val) {
